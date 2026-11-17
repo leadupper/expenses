@@ -1,0 +1,2918 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CardPulse HK</title>
+  <style>
+    /* ==========================================================================
+       1. 設計系統與主題變數 (Design Tokens - Light & Dark Mode)
+       ========================================================================== */
+    :root {
+      --bg-app: #f4f6f9;
+      --bg-surface: #ffffff;
+      --bg-surface-hover: #f8fafc;
+      --bg-subtle: #eef2f6;
+      --bg-input: #f8fafc;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border-color: #e2e8f0;
+      --border-focus: #6366f1;
+      --accent-primary: #4f46e5;
+      --accent-primary-hover: #4338ca;
+      --accent-soft: rgba(79, 70, 229, 0.1);
+      --success: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.12);
+      --warning: #f59e0b;
+      --warning-bg: rgba(245, 158, 11, 0.14);
+      --danger: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.12);
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+      --shadow-lg: 0 12px 32px -4px rgba(15, 23, 42, 0.12);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang HK", "Microsoft JhengHei", "Segoe UI", Roboto, sans-serif;
+      --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="dark"] {
+      --bg-app: #090d16;
+      --bg-surface: #111827;
+      --bg-surface-hover: #1e293b;
+      --bg-subtle: #1e293b;
+      --bg-input: #0f172a;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #64748b;
+      --border-color: #1e293b;
+      --border-focus: #818cf8;
+      --accent-primary: #6366f1;
+      --accent-primary-hover: #818cf8;
+      --accent-soft: rgba(99, 102, 241, 0.18);
+      --success: #34d399;
+      --success-bg: rgba(52, 211, 153, 0.15);
+      --warning: #fbbf24;
+      --warning-bg: rgba(251, 191, 36, 0.15);
+      --danger: #f87171;
+      --danger-bg: rgba(248, 113, 113, 0.15);
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 6px 20px -2px rgba(0, 0, 0, 0.45);
+      --shadow-lg: 0 16px 40px -4px rgba(0, 0, 0, 0.65);
+    }
+
+    /* ==========================================================================
+       2. 基礎重置與排版 (Base Reset & Typography)
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      min-height: 100%;
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+    }
+
+    /* ==========================================================================
+       3. 頂部導航列 (Top Navigation Bar)
+       ========================================================================== */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: color-mix(in srgb, var(--bg-surface) 86%, transparent);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 20px;
+    }
+
+    .navbar-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #4f46e5 0%, #ec4899 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .offline-badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      background: var(--success-bg);
+      color: var(--success);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .offline-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    .nav-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 通用按鈕與控制項 */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+      min-height: 38px;
+      user-select: none;
+    }
+
+    .btn:hover {
+      background: var(--bg-surface-hover);
+      border-color: var(--text-muted);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-primary-hover);
+      border-color: var(--accent-primary-hover);
+    }
+
+    .btn-icon {
+      padding: 8px;
+      width: 38px;
+      height: 38px;
+    }
+
+    .select-pill {
+      appearance: none;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 34px 8px 12px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      min-height: 38px;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      transition: var(--transition);
+    }
+
+    .select-pill:focus {
+      outline: none;
+      border-color: var(--border-focus);
+    }
+
+    /* ==========================================================================
+       4. 主容器與網格系統 (Main Layout & Dashboard Grids)
+       ========================================================================== */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+
+    .card-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* KPI 網格 */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .kpi-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent-soft);
+      color: var(--accent-primary);
+    }
+
+    .kpi-value {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.15;
+    }
+
+    .kpi-footer {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .badge {
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      font-size: 0.74rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .badge-up { background: var(--danger-bg); color: var(--danger); }
+    .badge-down { background: var(--success-bg); color: var(--success); }
+    .badge-neutral { background: var(--bg-subtle); color: var(--text-secondary); }
+
+    /* 雙欄圖表網格 */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .chart-toggle-group {
+      display: inline-flex;
+      background: var(--bg-subtle);
+      padding: 3px;
+      border-radius: var(--radius-sm);
+    }
+
+    .chart-toggle-btn {
+      border: none;
+      background: transparent;
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border-radius: 6px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .chart-toggle-btn.active {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .pie-layout {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      align-items: center;
+      gap: 20px;
+      min-height: 240px;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      height: 230px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .canvas-wrapper canvas {
+      display: block;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    /* 互動式圖例列表 */
+    .legend-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 240px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      background: var(--bg-subtle);
+      cursor: pointer;
+      transition: var(--transition);
+      gap: 8px;
+    }
+
+    .legend-item:hover, .legend-item.active {
+      border-color: var(--accent-primary);
+      background: var(--accent-soft);
+    }
+
+    .legend-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .legend-name {
+      font-size: 0.84rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .legend-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .legend-amount {
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .legend-pct {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+
+    /* 趨勢長條圖區域 */
+    .trend-canvas-wrap {
+      position: relative;
+      width: 100%;
+      height: 230px;
+    }
+
+    /* ==========================================================================
+       5. 虛擬信用卡包 & 預算 & 商戶排行 (Wallet, Budget & Merchants)
+       ========================================================================== */
+    .middle-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 20px;
+    }
+
+    .wallet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+    }
+
+    .credit-card-ui {
+      border-radius: 16px;
+      padding: 18px;
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 148px;
+      box-shadow: 0 8px 20px -4px rgba(15, 23, 42, 0.22);
+      border: 2px solid transparent;
+    }
+
+    .credit-card-ui:hover {
+      transform: translateY(-3px);
+    }
+
+    .credit-card-ui.selected-card {
+      border-color: #ffffff;
+      box-shadow: 0 0 0 3px var(--accent-primary), 0 10px 24px rgba(79, 70, 229, 0.35);
+    }
+
+    .credit-card-ui::after {
+      content: "";
+      position: absolute;
+      right: -24px;
+      top: -24px;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      pointer-events: none;
+    }
+
+    .cc-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .cc-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 1.3;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .cc-chip {
+      width: 28px;
+      height: 20px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.45), rgba(255,255,255,0.15));
+      border: 1px solid rgba(255,255,255,0.35);
+      flex-shrink: 0;
+    }
+
+    .cc-amount {
+      font-size: 1.45rem;
+      font-weight: 800;
+      margin: 10px 0 6px;
+    }
+
+    .cc-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.76rem;
+      opacity: 0.9;
+    }
+
+    .cc-bar {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 99px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .cc-bar-fill {
+      height: 100%;
+      background: #ffffff;
+      border-radius: 99px;
+      transition: width 0.5s ease;
+    }
+
+    /* 預算進度條 */
+    .budget-box {
+      background: var(--bg-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .budget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .budget-input-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .budget-input {
+      width: 105px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .progress-track {
+      height: 10px;
+      background: var(--border-color);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width 0.4s ease, background-color 0.3s ease;
+    }
+
+    /* 商戶排行榜 */
+    .merchant-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .merchant-row {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .merchant-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+
+    .merchant-title {
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .rank-num {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .rank-num.top-1 { background: #fef3c7; color: #b45309; }
+    .rank-num.top-2 { background: #e2e8f0; color: #334155; }
+    .rank-num.top-3 { background: #ffedd5; color: #c2410c; }
+
+    .merchant-bar-bg {
+      height: 6px;
+      background: var(--bg-subtle);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .merchant-bar-fill {
+      height: 100%;
+      background: var(--accent-primary);
+      border-radius: 99px;
+    }
+
+    /* ==========================================================================
+       6. 交易明細探索器 (Transaction Explorer & Table)
+       ========================================================================== */
+    .filter-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 210px;
+      position: relative;
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 12px 8px 36px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: var(--bg-input);
+      min-height: 38px;
+      transition: var(--transition);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      background: var(--bg-surface);
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    th:hover {
+      color: var(--text-primary);
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.875rem;
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr {
+      transition: background-color 0.15s ease;
+    }
+
+    tbody tr:hover {
+      background: var(--bg-surface-hover);
+    }
+
+    .cat-select {
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .card-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .card-pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .amount-cell {
+      font-weight: 700;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .amount-negative {
+      color: var(--success);
+    }
+
+    .btn-del {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-del:hover {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .btn-danger-outline {
+      color: var(--danger);
+      border-color: color-mix(in srgb, var(--danger) 35%, var(--border-color));
+    }
+
+    .btn-danger-outline:hover {
+      background: var(--danger-bg);
+      border-color: var(--danger);
+    }
+
+    /* 空狀態引導卡片 (Empty State Onboarding) */
+    .empty-hero {
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-focus);
+      border-radius: var(--radius-lg);
+      padding: 32px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .empty-hero-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: var(--accent-soft);
+      color: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ==========================================================================
+       7. 懸浮 Tooltip 與 Modal 視窗 (Tooltip, Modals & Toast)
+       ========================================================================== */
+    .chart-tooltip {
+      position: fixed;
+      z-index: 100;
+      pointer-events: none;
+      background: rgba(15, 23, 42, 0.94);
+      color: #f8fafc;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      max-width: 260px;
+    }
+
+    .chart-tooltip.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-dialog {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 680px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-lg);
+      animation: modalIn 0.2s ease-out;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.96) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .paste-area {
+      width: 100%;
+      min-height: 200px;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: var(--bg-input);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      resize: vertical;
+    }
+
+    .paste-area:focus {
+      outline: none;
+      border-color: var(--border-focus);
+    }
+
+    .preview-banner {
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      background: var(--accent-soft);
+      color: var(--accent-primary);
+      font-size: 0.84rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .form-control {
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: var(--bg-input);
+      min-height: 38px;
+    }
+
+    /* Toast 通知 */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 90;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: slideUp 0.25s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================================================
+       8. 跨裝置響應式適配 (Responsive Breakpoints)
+       ========================================================================== */
+    @media (max-width: 1100px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .charts-grid, .middle-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 12px;
+        gap: 14px;
+      }
+      .navbar {
+        padding: 10px 12px;
+      }
+      .kpi-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .kpi-card {
+        padding: 14px;
+      }
+      .kpi-value {
+        font-size: 1.3rem;
+      }
+      .pie-layout {
+        grid-template-columns: 1fr;
+      }
+      .canvas-wrapper {
+        height: 210px;
+      }
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .btn-text-hide-sm {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 頂部導航列 -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="3"></rect>
+            <line x1="2" y1="10" x2="22" y2="10"></line>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">
+            CardPulse HK
+            <span class="offline-badge"><span class="offline-dot"></span>離線就緒</span>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">每月信用卡與消費交易紀錄智能分析</div>
+        </div>
+      </div>
+
+      <div class="nav-controls">
+        <!-- 月份篩選器 -->
+        <select id="monthSelect" class="select-pill" aria-label="選擇分析月份">
+          <option value="ALL">全部月份總和</option>
+        </select>
+
+        <!-- 匯入/貼上按鈕 -->
+        <button class="btn btn-primary" id="openImportBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <span>貼上 / 匯入紀錄</span>
+        </button>
+
+        <!-- 手動新增單筆 -->
+        <button class="btn" id="openAddBtn" title="手動新增一筆交易">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span class="btn-text-hide-sm">記一筆</span>
+        </button>
+
+        <!-- 匯出 CSV -->
+        <button class="btn" id="exportCsvBtn" title="匯出 CSV 報表">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span class="btn-text-hide-sm">匯出 CSV</span>
+        </button>
+
+        <!-- 深淺色模式切換 -->
+        <button class="btn btn-icon" id="themeToggleBtn" aria-label="切換深色或淺色模式" title="切換深色/淺色模式">
+          <svg id="themeIconSun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg id="themeIconMoon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主內容區 -->
+  <main class="container">
+
+    <!-- 初次使用 / 無資料時的友善引導橫幅 -->
+    <section id="emptyOnboardingBanner" class="empty-hero" style="display:none;" aria-label="開始使用引導">
+      <div class="empty-hero-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+      </div>
+      <div style="max-width: 520px;">
+        <h2 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 4px;">歡迎使用 CardPulse HK · 100% 私密本地分析</h2>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">
+          目前尚無任何交易紀錄。您的所有資料只會儲存在此瀏覽器的本地空間（LocalStorage），不會上傳至任何伺服器或公開於原始碼中。
+        </p>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 4px;">
+        <button class="btn btn-primary" id="emptyCtaImportBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          <span>匯入 / 貼上交易紀錄</span>
+        </button>
+        <button class="btn" id="emptyCtaAddBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>手動記一筆</span>
+        </button>
+        <label class="btn" style="cursor:pointer;" title="從先前匯出的 JSON 備份檔還原">
+          <span>還原 JSON 備份</span>
+          <input type="file" id="restoreJsonInput" accept=".json,application/json" style="display:none;">
+        </label>
+      </div>
+    </section>
+
+    <!-- 1. KPI 總覽卡片組 -->
+    <section class="kpi-grid" aria-label="核心財務指標">
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span id="kpiTotalLabel">總支出金額</span>
+          <div class="kpi-icon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          </div>
+        </div>
+        <div class="kpi-value tabular-nums" id="kpiTotalAmount">HK$0.00</div>
+        <div class="kpi-footer" id="kpiTotalTrend">載入中...</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span>交易筆數與均價</span>
+          <div class="kpi-icon" style="background: rgba(16,185,129,0.12); color: #10b981;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          </div>
+        </div>
+        <div class="kpi-value tabular-nums" id="kpiCount">0 筆</div>
+        <div class="kpi-footer tabular-nums" id="kpiAvgAmount">平均每筆 HK$0.00</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span>主力消費信用卡</span>
+          <div class="kpi-icon" style="background: rgba(236,72,153,0.12); color: #ec4899;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+          </div>
+        </div>
+        <div class="kpi-value" style="font-size: 1.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="kpiTopCard">-</div>
+        <div class="kpi-footer tabular-nums" id="kpiTopCardSub">佔總支出 0%</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span>單筆最高消費</span>
+          <div class="kpi-icon" style="background: rgba(245,158,11,0.14); color: #f59e0b;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          </div>
+        </div>
+        <div class="kpi-value tabular-nums" id="kpiMaxTx">HK$0.00</div>
+        <div class="kpi-footer" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="kpiMaxTxMerchant">-</div>
+      </div>
+    </section>
+
+    <!-- 2. 核心圓餅圖與佔比分析區 (信用卡分佈 + 消費分類分佈) -->
+    <section class="charts-grid">
+      <!-- 信用卡消費佔比 Pie / Donut Chart -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              信用卡消費佔比
+              <span class="badge badge-neutral" id="cardPiePeriodBadge">全部月份</span>
+            </div>
+            <div class="card-subtitle">點擊圖表切片或右側卡別可快速篩選交易明細</div>
+          </div>
+          <div class="chart-toggle-group" role="group" aria-label="切換圖表樣式">
+            <button class="chart-toggle-btn active" data-chart="card" data-type="donut">環形圖</button>
+            <button class="chart-toggle-btn" data-chart="card" data-type="pie">圓餅圖</button>
+          </div>
+        </div>
+        <div class="pie-layout">
+          <div class="canvas-wrapper">
+            <canvas id="cardPieCanvas"></canvas>
+          </div>
+          <div class="legend-list" id="cardLegendList"></div>
+        </div>
+      </div>
+
+      <!-- 消費分類佔比 Pie / Donut Chart -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              消費類別分佈
+              <span class="badge badge-neutral" id="catPiePeriodBadge">全部月份</span>
+            </div>
+            <div class="card-subtitle">自動根據香港商戶關鍵字分類，亦可於下方手動調整</div>
+          </div>
+          <div class="chart-toggle-group" role="group" aria-label="切換分類圖表樣式">
+            <button class="chart-toggle-btn active" data-chart="cat" data-type="donut">環形圖</button>
+            <button class="chart-toggle-btn" data-chart="cat" data-type="pie">圓餅圖</button>
+          </div>
+        </div>
+        <div class="pie-layout">
+          <div class="canvas-wrapper">
+            <canvas id="catPieCanvas"></canvas>
+          </div>
+          <div class="legend-list" id="catLegendList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 每日 / 每月消費趨勢長條圖 -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title" id="trendChartTitle">跨月消費總額趨勢對比</div>
+          <div class="card-subtitle" id="trendChartSubtitle">滑鼠移動或點擊長條可檢視當日/當月精確消費數據</div>
+        </div>
+      </div>
+      <div class="trend-canvas-wrap">
+        <canvas id="trendBarCanvas"></canvas>
+      </div>
+    </section>
+
+    <!-- 4. 虛擬信用卡包 & 預算追蹤 + 商戶排行榜 -->
+    <section class="middle-grid">
+      <!-- 左側：虛擬卡包總覽 -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">信用卡帳戶總覽（Card Wallet）</div>
+            <div class="card-subtitle">點擊卡片切換篩選該卡消費，再次點擊取消篩選</div>
+          </div>
+          <button class="btn" id="clearCardFilterBtn" style="display:none; padding: 4px 10px; min-height: 30px; font-size: 0.78rem;">顯示全部卡片</button>
+        </div>
+        <div class="wallet-grid" id="walletGrid"></div>
+      </div>
+
+      <!-- 右側：每月預算追蹤 & 商戶排行榜 -->
+      <div class="card">
+        <div class="card-header" style="margin-bottom: 10px;">
+          <div class="card-title">每月預算與熱門商戶排行</div>
+        </div>
+
+        <!-- 預算設定區塊 -->
+        <div class="budget-box">
+          <div class="budget-header">
+            <span>每月支出預算目標 (HK$)</span>
+            <div class="budget-input-group">
+              <input type="number" id="budgetInput" class="budget-input tabular-nums" min="0" step="100" value="3000">
+            </div>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="budgetProgressFill" style="width: 0%;"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.76rem; color:var(--text-secondary); margin-top:6px;">
+            <span id="budgetStatusText">已使用 0%</span>
+            <span id="budgetRemainingText" class="tabular-nums">剩餘 HK$3,000.00</span>
+          </div>
+        </div>
+
+        <!-- Top 商戶排行榜 -->
+        <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 10px;">消費金額最高商戶 Top 5</div>
+        <div class="merchant-list" id="merchantLeaderboard"></div>
+      </div>
+    </section>
+
+    <!-- 5. 交易明細探索器 -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">
+            交易明細紀錄
+            <span class="badge badge-neutral tabular-nums" id="tableCountBadge">0 筆</span>
+          </div>
+          <div class="card-subtitle">支援即時搜尋、卡別/分類篩選、排序與直接修改分類</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn" id="copyReportBtn" style="font-size:0.8rem; min-height:34px;">複製摘要報表</button>
+          <button class="btn" id="exportJsonBtn" style="font-size:0.8rem; min-height:34px;" title="下載完整 JSON 備份以便跨裝置轉移">備份 JSON</button>
+          <button class="btn btn-danger-outline" id="clearAllDataBtn" style="font-size:0.8rem; min-height:34px;" title="永久清除瀏覽器內所有本地儲存紀錄">清空所有本地紀錄</button>
+        </div>
+      </div>
+
+      <div class="filter-toolbar">
+        <div class="search-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="searchInput" class="search-input" placeholder="搜尋商戶名稱、日期 (如 YYYYMM) 或金額...">
+        </div>
+        <select id="cardFilterSelect" class="select-pill" aria-label="依信用卡篩選">
+          <option value="ALL">所有信用卡</option>
+        </select>
+        <select id="catFilterSelect" class="select-pill" aria-label="依消費分類篩選">
+          <option value="ALL">所有消費分類</option>
+          <option value="交通出行">🚇 交通出行</option>
+          <option value="超市百貨">🛒 超市百貨</option>
+          <option value="餐飲美食">🍜 餐飲美食</option>
+          <option value="網購娛樂">🛍️ 網購娛樂</option>
+          <option value="日常消費">💳 日常消費</option>
+        </select>
+        <select id="sortSelect" class="select-pill" aria-label="排序方式">
+          <option value="date-desc">日期：最新至最舊</option>
+          <option value="date-asc">日期：最舊至最新</option>
+          <option value="amount-desc">金額：高至低</option>
+          <option value="amount-asc">金額：低至高</option>
+        </select>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>日期時間</th>
+              <th>商戶名稱</th>
+              <th>分類</th>
+              <th>信用卡</th>
+              <th style="text-align:right;">金額 (HKD)</th>
+              <th style="width:44px; text-align:center;">操作</th>
+            </tr>
+          </thead>
+          <tbody id="txTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- 懸浮圖表 Tooltip -->
+  <div id="chartTooltip" class="chart-tooltip" role="tooltip"></div>
+
+  <!-- Modal 1: 貼上與匯入交易紀錄 -->
+  <div id="importModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="importModalTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="importModalTitle" style="font-size:1.05rem; font-weight:700;">貼上 / 匯入信用卡交易紀錄</h3>
+        <button class="btn-del" id="closeImportModal" aria-label="關閉視窗">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.84rem; color:var(--text-secondary);">
+          直接從 Excel、Google Sheets、Notion 或純文字複製並貼上（支援 Tab 分隔、CSV 或「每四行一筆」垂直格式，自動忽略標題列）：
+        </p>
+        <textarea id="pasteTextarea" class="paste-area" placeholder="格式範例（支援 Tab 分隔或每四行一筆）：
+YYYYMMDD HH:MM	商戶名稱	HK$0.00	信用卡名稱
+20260115 12:30	範例商戶 A	HK$50.00	信用卡 A"></textarea>
+        <div class="preview-banner" id="importPreviewBanner">
+          <span>等待貼上資料...</span>
+          <span class="tabular-nums">0 筆有效紀錄</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" id="cancelImportBtn">取消</button>
+        <button class="btn" id="importReplaceBtn" title="清空現有資料並完全以此批資料取代">覆蓋現有紀錄</button>
+        <button class="btn btn-primary" id="importMergeBtn" title="保留現有紀錄並自動過濾重複項目">附加並自動去重</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: 手動新增單筆交易 -->
+  <div id="addTxModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="addTxModalTitle">
+    <div class="modal-dialog" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 id="addTxModalTitle" style="font-size:1.05rem; font-weight:700;">手動新增交易紀錄</h3>
+        <button class="btn-del" id="closeAddModal" aria-label="關閉視窗">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <form id="addTxForm">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="addDateInput">日期與時間</label>
+              <input type="datetime-local" id="addDateInput" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="addAmountInput">金額 (HK$)</label>
+              <input type="number" id="addAmountInput" class="form-control tabular-nums" step="0.01" placeholder="例如 45.50" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="addMerchantInput">商戶名稱</label>
+            <input type="text" id="addMerchantInput" class="form-control" placeholder="輸入商戶名稱" required>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="addCardInput">信用卡名稱</label>
+              <input type="text" id="addCardInput" list="existingCardsList" class="form-control" placeholder="選擇或輸入卡名" required>
+              <datalist id="existingCardsList"></datalist>
+            </div>
+            <div class="form-group">
+              <label for="addCatInput">消費分類</label>
+              <select id="addCatInput" class="form-control">
+                <option value="AUTO">✨ 自動智能辨識</option>
+                <option value="交通出行">🚇 交通出行</option>
+                <option value="超市百貨">🛒 超市百貨</option>
+                <option value="餐飲美食">🍜 餐飲美食</option>
+                <option value="網購娛樂">🛍️ 網購娛樂</option>
+                <option value="日常消費">💳 日常消費</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" id="cancelAddBtn">取消</button>
+          <button type="submit" class="btn btn-primary">儲存紀錄</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast 訊息容器 -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <script>
+    /**
+     * ============================================================================
+     * CardPulse HK - 完全離線信用卡與交易分析引擎（無硬編碼個人紀錄版）
+     * 零外部依賴 · 原生 Canvas 高解析度繪圖 · 智能多格式解析 · LocalStorage 持久化
+     * ============================================================================
+     */
+
+    const STORAGE_KEYS = {
+      TX_LIST: 'cardpulse_hk_transactions_v1',
+      BUDGET: 'cardpulse_hk_budget_v1',
+      THEME: 'cardpulse_hk_theme_v1'
+    };
+
+    // 現代 Fintech 配色盤（依匯入卡片順序自動分配）
+    const CARD_PALETTE = [
+      { solid: '#e11d48', grad: 'linear-gradient(135deg, #e11d48 0%, #9333ea 100%)' },
+      { solid: '#0d9488', grad: 'linear-gradient(135deg, #059669 0%, #0284c7 100%)' },
+      { solid: '#4f46e5', grad: 'linear-gradient(135deg, #4f46e5 0%, #2563eb 100%)' },
+      { solid: '#d97706', grad: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)' },
+      { solid: '#7c3aed', grad: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)' },
+      { solid: '#0891b2', grad: 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)' }
+    ];
+
+    const CATEGORY_CONFIG = {
+      '交通出行': { color: '#3b82f6', icon: '🚇' },
+      '超市百貨': { color: '#10b981', icon: '🛒' },
+      '餐飲美食': { color: '#f59e0b', icon: '🍜' },
+      '網購娛樂': { color: '#ec4899', icon: '🛍️' },
+      '日常消費': { color: '#8b5cf6', icon: '💳' }
+    };
+
+    // 全域應用程式狀態（預設為空陣列，絕不包含任何硬編碼個人數據）
+    const state = {
+      transactions: [],
+      selectedMonth: 'ALL',
+      selectedCard: 'ALL',
+      selectedCategory: 'ALL',
+      searchQuery: '',
+      sortBy: 'date-desc',
+      budget: 3000,
+      chartTypes: {
+        card: 'donut',
+        cat: 'donut'
+      },
+      cardColorMap: {},
+      hitAreas: {
+        cardPie: [],
+        catPie: [],
+        trendBar: []
+      },
+      hoveredSlice: {
+        cardPie: -1,
+        catPie: -1,
+        trendBar: -1
+      },
+      clearConfirmPending: false,
+      clearConfirmTimer: null
+    };
+
+    // ==========================================================================
+    // 2. 智能資料解析引擎 (Smart Multi-Format Parser & Categorizer)
+    // ==========================================================================
+
+    /**
+     * 根據香港商戶名稱自動分類
+     */
+    function autoCategorizeMerchant(merchant) {
+      const m = (merchant || '').toLowerCase();
+      if (/transit|mtr|kmb|bus|citybus|ferry|octopus|八達通|uber|taxi|的士|九巴|城巴|港鐵|停車場|parking/.test(m)) {
+        return '交通出行';
+      }
+      if (/yata|一田|百佳|parknshop|wellcome|惠康|7-eleven|7-11|circle k|ok便利|aeon|donki|sogo|崇光|mannings|萬寧|watsons|屈臣氏|market|supermarket|超市/.test(m)) {
+        return '超市百貨';
+      }
+      if (/cafe|coffee|starbucks|pacific coffee|mcdonald|麥當勞|kfc|fairwood|大快活|cafe de coral|大家樂|maxim|美心|tamjai|譚仔|sushi|壽司|restaurant|bakery|茶餐廳|冰室|食|麵|飯/.test(m)) {
+        return '餐飲美食';
+      }
+      if (/apple|netflix|spotify|amazon|taobao|淘寶|hktvmall|steam|playstation|cinema|戲院|youtube|google/.test(m)) {
+        return '網購娛樂';
+      }
+      return '日常消費';
+    }
+
+    /**
+     * 解析日期字串 (支援 YYYYMMDD HH:mm, YYYY-MM-DD HH:mm, YYYY/MM/DD 等)
+     */
+    function parseDateInfo(dateStr) {
+      const cleaned = dateStr.trim();
+      // 匹配 20261117 18:31 或 2026-11-17 18:31 或 2026/11/17
+      const match = cleaned.match(/^(\d{4})[-/]?(\d{2})[-/]?(\d{2})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+      if (!match) return null;
+
+      const [, y, m, d, hh = '00', mm = '00'] = match;
+      const year = parseInt(y, 10);
+      const month = parseInt(m, 10);
+      const day = parseInt(d, 10);
+      if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+
+      const dateObj = new Date(year, month - 1, day, parseInt(hh, 10), parseInt(mm, 10));
+      const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+      const monthKey = `${y}-${m}`;
+      const dayKey = `${y}-${m}-${d}`;
+      const displayDate = `${y}-${m}-${d} ${hh}:${mm}`;
+
+      return {
+        rawDate: cleaned,
+        displayDate,
+        monthKey,
+        dayKey,
+        dayNum: day,
+        weekday: `週${weekDays[dateObj.getDay()]}`,
+        timestamp: dateObj.getTime()
+      };
+    }
+
+    /**
+     * 解析金額字串 (支援 HK$4.00, -HK$10.00, HKD 400, $5.20)
+     */
+    function parseAmount(amountStr) {
+      if (typeof amountStr === 'number') return amountStr;
+      const cleaned = String(amountStr).replace(/HK\$|HKD|\$|,/gi, '').trim();
+      const val = parseFloat(cleaned);
+      return Number.isFinite(val) ? Math.round(val * 100) / 100 : null;
+    }
+
+    /**
+     * 解析用戶貼上的原始文字（支援 Tab分隔、CSV、或每四行一筆的垂直貼上）
+     */
+    function parseRawTransactions(rawText) {
+      if (!rawText || !rawText.trim()) return [];
+      const lines = rawText
+        .split(/\r?\n/)
+        .map(l => l.trim())
+        .filter(l => l.length > 0);
+
+      const results = [];
+      const isHeaderLine = (line) => /^(日期|date)[\t,\s]+(商戶|merchant)/i.test(line);
+
+      // 檢查是否為垂直 4 行一組的格式（常見於網頁表格直接複製）
+      const nonHeaderLines = lines.filter(l => !isHeaderLine(l) && !/^(日期|商戶|金額|信用卡)$/i.test(l));
+      const singleLineHasTab = nonHeaderLines.some(l => l.includes('\t'));
+
+      if (!singleLineHasTab && nonHeaderLines.length >= 4 && parseDateInfo(nonHeaderLines[0]) && !parseDateInfo(nonHeaderLines[1])) {
+        // 每 4 行解析一筆
+        for (let i = 0; i + 3 < nonHeaderLines.length; i += 4) {
+          const dInfo = parseDateInfo(nonHeaderLines[i]);
+          const merchant = nonHeaderLines[i + 1].trim();
+          const amount = parseAmount(nonHeaderLines[i + 2]);
+          const card = nonHeaderLines[i + 3].trim();
+
+          if (dInfo && merchant && amount !== null && card) {
+            results.push(buildTxObject(dInfo, merchant, amount, card));
+          }
+        }
+        return results;
+      }
+
+      // 逐行解析 (Tab 分隔 / 逗號分隔 / 智慧正則拆解)
+      for (const line of lines) {
+        if (isHeaderLine(line)) continue;
+
+        let parts = [];
+        if (line.includes('\t')) {
+          parts = line.split('\t').map(p => p.trim()).filter(Boolean);
+        } else if (line.includes(',')) {
+          parts = line.split(',').map(p => p.trim()).filter(Boolean);
+        } else {
+          // 嘗試以「日期 + 商戶 + HK$金額 + 信用卡」正則切分
+          const regexMatch = line.match(/^(\d{4}[-/]?\d{2}[-/]?\d{2}(?:\s+\d{2}:\d{2})?)\s+(.+?)\s+([+-]?(?:HK\$|HKD|\$)\s*[\d,.]+)\s+(.+)$/i);
+          if (regexMatch) {
+            parts = [regexMatch[1], regexMatch[2], regexMatch[3], regexMatch[4]];
+          }
+        }
+
+        if (parts.length >= 4) {
+          const dInfo = parseDateInfo(parts[0]);
+          const merchant = parts[1];
+          const amount = parseAmount(parts[2]);
+          const card = parts.slice(3).join(' ');
+
+          if (dInfo && merchant && amount !== null && card) {
+            results.push(buildTxObject(dInfo, merchant, amount, card));
+          }
+        }
+      }
+      return results;
+    }
+
+    function buildTxObject(dInfo, merchant, amount, card, customCategory = null) {
+      const signature = `${dInfo.displayDate}|${merchant.toLowerCase()}|${amount.toFixed(2)}|${card.toLowerCase()}`;
+      return {
+        id: 'tx_' + Math.random().toString(36).slice(2, 10) + '_' + Date.now().toString(36),
+        signature,
+        displayDate: dInfo.displayDate,
+        monthKey: dInfo.monthKey,
+        dayKey: dInfo.dayKey,
+        dayNum: dInfo.dayNum,
+        weekday: dInfo.weekday,
+        timestamp: dInfo.timestamp,
+        merchant,
+        amount,
+        card,
+        category: customCategory || autoCategorizeMerchant(merchant)
+      };
+    }
+
+    // ==========================================================================
+    // 3. 資料儲存與卡片色彩分配 (Persistence & Card Branding)
+    // ==========================================================================
+
+    function loadInitialState() {
+      // 載入主題
+      const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME) ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      applyTheme(savedTheme);
+
+      // 載入預算
+      const savedBudget = parseFloat(localStorage.getItem(STORAGE_KEYS.BUDGET));
+      if (Number.isFinite(savedBudget) && savedBudget >= 0) {
+        state.budget = savedBudget;
+        document.getElementById('budgetInput').value = savedBudget;
+      }
+
+      // 僅從使用者自己瀏覽器的 localStorage 讀取紀錄，無紀錄時保持完全空白
+      const savedTx = localStorage.getItem(STORAGE_KEYS.TX_LIST);
+      if (savedTx) {
+        try {
+          const parsed = JSON.parse(savedTx);
+          if (Array.isArray(parsed)) {
+            state.transactions = parsed;
+            return;
+          }
+        } catch (e) {
+          console.warn('讀取本地快取失敗，初始化為空狀態', e);
+        }
+      }
+      state.transactions = [];
+    }
+
+    function saveTransactions() {
+      try {
+        localStorage.setItem(STORAGE_KEYS.TX_LIST, JSON.stringify(state.transactions));
+      } catch (e) {
+        showToast('瀏覽器儲存空間已滿，無法寫入本地快取');
+      }
+    }
+
+    function assignCardColors() {
+      const uniqueCards = [...new Set(state.transactions.map(t => t.card))];
+      uniqueCards.forEach((cardName, idx) => {
+        if (!state.cardColorMap[cardName]) {
+          state.cardColorMap[cardName] = CARD_PALETTE[idx % CARD_PALETTE.length];
+        }
+      });
+    }
+
+    // ==========================================================================
+    // 4. 格式化工具與資料聚合 (Formatters & Aggregations)
+    // ==========================================================================
+
+    function formatHKD(val) {
+      const sign = val < 0 ? '-' : '';
+      const abs = Math.abs(val);
+      return `${sign}HK$${abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    function formatMonthLabel(monthKey) {
+      if (monthKey === 'ALL') return '全部月份總和';
+      const [y, m] = monthKey.split('-');
+      return `${y}年${parseInt(m, 10)}月`;
+    }
+
+    function getFilteredTransactions(ignoreCardFilter = false) {
+      return state.transactions.filter(tx => {
+        if (state.selectedMonth !== 'ALL' && tx.monthKey !== state.selectedMonth) return false;
+        if (!ignoreCardFilter && state.selectedCard !== 'ALL' && tx.card !== state.selectedCard) return false;
+        if (state.selectedCategory !== 'ALL' && tx.category !== state.selectedCategory) return false;
+        if (state.searchQuery) {
+          const q = state.searchQuery.toLowerCase();
+          const matchMerchant = tx.merchant.toLowerCase().includes(q);
+          const matchDate = tx.displayDate.toLowerCase().includes(q) || tx.displayDate.replace(/-/g, '').includes(q);
+          const matchAmount = tx.amount.toFixed(2).includes(q);
+          const matchCard = tx.card.toLowerCase().includes(q);
+          if (!matchMerchant && !matchDate && !matchAmount && !matchCard) return false;
+        }
+        return true;
+      });
+    }
+
+    // ==========================================================================
+    // 5. 原生 HTML5 Canvas 高解析度視覺化圖表引擎 (Zero-Dependency Charts)
+    // ==========================================================================
+
+    function setupHighDPICanvas(canvas, width, height) {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      return ctx;
+    }
+
+    /**
+     * 繪製圓餅圖 / 環形圖 (Pie & Donut Chart)
+     */
+    function renderPieChart(canvasId, items, totalAmount, chartType, hoveredIdx, hitAreaKey) {
+      const canvas = document.getElementById(canvasId);
+      const wrapper = canvas.parentElement;
+      const size = Math.min(wrapper.clientWidth || 220, wrapper.clientHeight || 220, 230);
+      const ctx = setupHighDPICanvas(canvas, size, size);
+
+      const cx = size / 2;
+      const cy = size / 2;
+      const outerRadius = (size / 2) - 14;
+      const innerRadius = chartType === 'donut' ? outerRadius * 0.62 : 0;
+
+      ctx.clearRect(0, 0, size, size);
+      state.hitAreas[hitAreaKey] = [];
+
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+      if (items.length === 0 || totalAmount <= 0) {
+        // 空狀態圓環
+        ctx.beginPath();
+        ctx.arc(cx, cy, outerRadius, 0, Math.PI * 2);
+        if (innerRadius > 0) ctx.arc(cx, cy, innerRadius, 0, Math.PI * 2, true);
+        ctx.fillStyle = isDark ? '#1e293b' : '#e2e8f0';
+        ctx.fill();
+
+        ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+        ctx.font = '600 13px -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('暫無消費數據', cx, cy);
+        return;
+      }
+
+      let startAngle = -Math.PI / 2;
+      const gapAngle = items.length > 1 ? 0.025 : 0;
+
+      items.forEach((item, index) => {
+        const sliceAngle = (item.amount / totalAmount) * Math.PI * 2;
+        const endAngle = startAngle + sliceAngle;
+        const isHovered = index === hoveredIdx;
+        const rOut = isHovered ? outerRadius + 6 : outerRadius;
+
+        ctx.save();
+        ctx.beginPath();
+        if (innerRadius > 0) {
+          ctx.arc(cx, cy, rOut, startAngle + gapAngle / 2, endAngle - gapAngle / 2);
+          ctx.arc(cx, cy, innerRadius, endAngle - gapAngle / 2, startAngle + gapAngle / 2, true);
+        } else {
+          ctx.moveTo(cx, cy);
+          ctx.arc(cx, cy, rOut, startAngle + gapAngle / 2, endAngle - gapAngle / 2);
+        }
+        ctx.closePath();
+
+        ctx.fillStyle = item.color;
+        if (isHovered) {
+          ctx.shadowColor = item.color;
+          ctx.shadowBlur = 12;
+        }
+        ctx.fill();
+        ctx.restore();
+
+        // 記錄互動角度熱區
+        state.hitAreas[hitAreaKey].push({
+          index,
+          cx,
+          cy,
+          innerRadius,
+          outerRadius: rOut,
+          startAngle: startAngle + Math.PI / 2,
+          endAngle: endAngle + Math.PI / 2,
+          item
+        });
+
+        startAngle = endAngle;
+      });
+
+      // 若為環形圖，於中心繪製總支出金額
+      if (chartType === 'donut') {
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        const activeItem = hoveredIdx >= 0 && items[hoveredIdx] ? items[hoveredIdx] : null;
+        ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+        ctx.font = '600 11px -apple-system, sans-serif';
+        const topLabel = activeItem ? (activeItem.label.length > 14 ? activeItem.label.slice(0, 13) + '…' : activeItem.label) : '本期總支出';
+        ctx.fillText(topLabel, cx, cy - 12);
+
+        ctx.fillStyle = isDark ? '#f8fafc' : '#0f172a';
+        ctx.font = '800 15px -apple-system, sans-serif';
+        const valText = activeItem ? formatHKD(activeItem.amount) : formatHKD(totalAmount);
+        ctx.fillText(valText, cx, cy + 8);
+      }
+    }
+
+    /**
+     * 繪製每日 / 跨月消費趨勢柱狀圖 (Bar Chart)
+     */
+    function renderTrendBarChart(txList) {
+      const canvas = document.getElementById('trendBarCanvas');
+      const wrap = canvas.parentElement;
+      const width = wrap.clientWidth || 600;
+      const height = wrap.clientHeight || 230;
+      const ctx = setupHighDPICanvas(canvas, width, height);
+
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const gridColor = isDark ? '#1e293b' : '#e2e8f0';
+      const labelColor = isDark ? '#94a3b8' : '#64748b';
+
+      ctx.clearRect(0, 0, width, height);
+      state.hitAreas.trendBar = [];
+
+      // 彙整柱狀圖數據：單月模式按「日」顯示；全部月份模式按「月」顯示
+      let bars = [];
+      if (state.selectedMonth === 'ALL') {
+        document.getElementById('trendChartTitle').textContent = '跨月總支出對比趨勢';
+        const monthMap = {};
+        txList.forEach(t => {
+          monthMap[t.monthKey] = (monthMap[t.monthKey] || 0) + Math.max(0, t.amount);
+        });
+        bars = Object.keys(monthMap).sort().map(mKey => ({
+          key: mKey,
+          label: mKey,
+          amount: monthMap[mKey]
+        }));
+      } else {
+        document.getElementById('trendChartTitle').textContent = `${formatMonthLabel(state.selectedMonth)} · 每日消費分佈`;
+        const [y, m] = state.selectedMonth.split('-').map(Number);
+        const daysInMonth = new Date(y, m, 0).getDate();
+        const dayMap = {};
+        txList.forEach(t => {
+          dayMap[t.dayNum] = (dayMap[t.dayNum] || 0) + Math.max(0, t.amount);
+        });
+        for (let d = 1; d <= daysInMonth; d++) {
+          bars.push({
+            key: `${state.selectedMonth}-${String(d).padStart(2, '0')}`,
+            label: `${d}日`,
+            amount: dayMap[d] || 0
+          });
+        }
+      }
+
+      const padLeft = 58;
+      const padRight = 16;
+      const padTop = 20;
+      const padBottom = 32;
+      const chartW = width - padLeft - padRight;
+      const chartH = height - padTop - padBottom;
+
+      const maxVal = Math.max(...bars.map(b => b.amount), 10);
+      const niceMax = Math.ceil(maxVal / 10) * 10;
+
+      // 繪製水平網格線與 Y 軸刻度
+      ctx.font = '500 11px -apple-system, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      const steps = 4;
+      for (let i = 0; i <= steps; i++) {
+        const val = (niceMax / steps) * i;
+        const yPos = padTop + chartH - (chartH * (i / steps));
+
+        ctx.beginPath();
+        ctx.moveTo(padLeft, yPos);
+        ctx.lineTo(width - padRight, yPos);
+        ctx.strokeStyle = gridColor;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.fillStyle = labelColor;
+        ctx.fillText(`$${Math.round(val)}`, padLeft - 8, yPos);
+      }
+
+      if (bars.length === 0) return;
+
+      const slotW = chartW / bars.length;
+      const barW = Math.min(Math.max(slotW * 0.58, 5), 42);
+
+      bars.forEach((bar, idx) => {
+        const x = padLeft + idx * slotW + (slotW - barW) / 2;
+        const barH = (bar.amount / niceMax) * chartH;
+        const y = padTop + chartH - barH;
+        const isHovered = state.hoveredSlice.trendBar === idx;
+
+        // 繪製圓角柱體
+        if (barH > 0) {
+          const grad = ctx.createLinearGradient(0, y, 0, padTop + chartH);
+          grad.addColorStop(0, isHovered ? '#ec4899' : '#6366f1');
+          grad.addColorStop(1, isHovered ? '#8b5cf6' : '#4f46e5');
+
+          ctx.fillStyle = grad;
+          drawTopRoundedRect(ctx, x, y, barW, barH, Math.min(5, barW / 2));
+          ctx.fill();
+        }
+
+        // X 軸標籤（自動跳格避免手機版重疊）
+        const skipInterval = bars.length > 15 && width < 640 ? 4 : (bars.length > 15 ? 2 : 1);
+        if (idx % skipInterval === 0 || idx === bars.length - 1) {
+          ctx.fillStyle = labelColor;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
+          ctx.fillText(bar.label, padLeft + idx * slotW + slotW / 2, padTop + chartH + 8);
+        }
+
+        state.hitAreas.trendBar.push({
+          index: idx,
+          x: padLeft + idx * slotW,
+          y: padTop,
+          w: slotW,
+          h: chartH,
+          bar
+        });
+      });
+    }
+
+    function drawTopRoundedRect(ctx, x, y, width, height, radius) {
+      const r = Math.min(radius, height);
+      ctx.beginPath();
+      ctx.moveTo(x, y + height);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.lineTo(x + width - r, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+      ctx.lineTo(x + width, y + height);
+      ctx.closePath();
+    }
+
+    // ==========================================================================
+    // 6. UI 渲染與互動更新 (Dashboard UI Rendering)
+    // ==========================================================================
+
+    function refreshDashboard() {
+      assignCardColors();
+      updateDropdownOptions();
+
+      // 無任何交易時顯示友善引導橫幅
+      const emptyBanner = document.getElementById('emptyOnboardingBanner');
+      emptyBanner.style.display = state.transactions.length === 0 ? 'flex' : 'none';
+
+      // 取得當前月份（不限卡片）的紀錄，用於繪製「信用卡佔比」與「虛擬卡包」
+      const monthTx = state.transactions.filter(t =>
+        state.selectedMonth === 'ALL' || t.monthKey === state.selectedMonth
+      );
+
+      // 取得完整篩選（月份 + 卡片 + 分類 + 搜尋）的紀錄
+      const filteredTx = getFilteredTransactions(false);
+
+      renderKPIs(monthTx, filteredTx);
+      renderCardPieAndLegend(monthTx);
+      renderCategoryPieAndLegend(filteredTx);
+      renderTrendBarChart(filteredTx);
+      renderCardWallet(monthTx);
+      renderBudgetAndMerchants(monthTx);
+      renderTransactionTable(filteredTx);
+    }
+
+    function updateDropdownOptions() {
+      // 月份選單
+      const months = [...new Set(state.transactions.map(t => t.monthKey))].sort().reverse();
+      const monthSel = document.getElementById('monthSelect');
+      const prevMonth = state.selectedMonth;
+      monthSel.innerHTML = `<option value="ALL">全部月份總和 (${months.length} 個月)</option>` +
+        months.map(m => `<option value="${m}">${formatMonthLabel(m)}</option>`).join('');
+      monthSel.value = months.includes(prevMonth) || prevMonth === 'ALL' ? prevMonth : 'ALL';
+      state.selectedMonth = monthSel.value;
+
+      // 信用卡選單 & datalist
+      const cards = [...new Set(state.transactions.map(t => t.card))].sort();
+      const cardSel = document.getElementById('cardFilterSelect');
+      const prevCard = state.selectedCard;
+      cardSel.innerHTML = `<option value="ALL">所有信用卡 (${cards.length} 張)</option>` +
+        cards.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+      cardSel.value = cards.includes(prevCard) || prevCard === 'ALL' ? prevCard : 'ALL';
+      state.selectedCard = cardSel.value;
+
+      document.getElementById('existingCardsList').innerHTML =
+        cards.map(c => `<option value="${escapeHtml(c)}">`).join('');
+
+      // 顯示/隱藏「顯示全部卡片」按鈕
+      document.getElementById('clearCardFilterBtn').style.display =
+        state.selectedCard !== 'ALL' ? 'inline-flex' : 'none';
+    }
+
+    function renderKPIs(monthTx, filteredTx) {
+      const total = filteredTx.reduce((sum, t) => sum + t.amount, 0);
+      const count = filteredTx.length;
+      const avg = count > 0 ? total / count : 0;
+
+      document.getElementById('kpiTotalLabel').textContent =
+        state.selectedMonth === 'ALL' ? '累計總支出金額' : `${formatMonthLabel(state.selectedMonth)}支出`;
+      document.getElementById('kpiTotalAmount').textContent = formatHKD(total);
+      document.getElementById('kpiCount').textContent = `${count} 筆`;
+      document.getElementById('kpiAvgAmount').textContent = `平均每筆 ${formatHKD(avg)}`;
+
+      // 計算與上月相比變化
+      const trendEl = document.getElementById('kpiTotalTrend');
+      if (state.selectedMonth !== 'ALL') {
+        const months = [...new Set(state.transactions.map(t => t.monthKey))].sort();
+        const idx = months.indexOf(state.selectedMonth);
+        if (idx > 0) {
+          const prevMonthKey = months[idx - 1];
+          const prevTotal = state.transactions
+            .filter(t => t.monthKey === prevMonthKey && (state.selectedCard === 'ALL' || t.card === state.selectedCard))
+            .reduce((s, t) => s + t.amount, 0);
+          if (prevTotal > 0) {
+            const diffPct = ((total - prevTotal) / prevTotal) * 100;
+            const badgeClass = diffPct > 0 ? 'badge-up' : 'badge-down';
+            const arrow = diffPct > 0 ? '▲' : '▼';
+            trendEl.innerHTML = `<span class="badge ${badgeClass}">${arrow} ${Math.abs(diffPct).toFixed(1)}%</span> 較 ${formatMonthLabel(prevMonthKey)}`;
+          } else {
+            trendEl.innerHTML = `<span class="badge badge-neutral">首月紀錄</span>`;
+          }
+        } else {
+          trendEl.innerHTML = `<span class="badge badge-neutral">最早月份數據</span>`;
+        }
+      } else {
+        const cardCount = new Set(filteredTx.map(t => t.card)).size;
+        trendEl.innerHTML = `涵蓋 <strong style="color:var(--text-primary);">${cardCount}</strong> 張信用卡帳戶`;
+      }
+
+      // 主力信用卡
+      const cardSums = {};
+      monthTx.forEach(t => { cardSums[t.card] = (cardSums[t.card] || 0) + t.amount; });
+      const sortedCards = Object.entries(cardSums).sort((a, b) => b[1] - a[1]);
+      const monthGrandTotal = monthTx.reduce((s, t) => s + t.amount, 0);
+
+      if (sortedCards.length > 0 && monthGrandTotal > 0) {
+        const [topCardName, topCardVal] = sortedCards[0];
+        const pct = (topCardVal / monthGrandTotal) * 100;
+        document.getElementById('kpiTopCard').textContent = topCardName;
+        document.getElementById('kpiTopCard').title = topCardName;
+        document.getElementById('kpiTopCardSub').textContent = `${formatHKD(topCardVal)} · 佔比 ${pct.toFixed(1)}%`;
+      } else {
+        document.getElementById('kpiTopCard').textContent = '無數據';
+        document.getElementById('kpiTopCardSub').textContent = '佔總支出 0%';
+      }
+
+      // 單筆最高消費
+      if (filteredTx.length > 0) {
+        const maxTx = [...filteredTx].sort((a, b) => b.amount - a.amount)[0];
+        document.getElementById('kpiMaxTx').textContent = formatHKD(maxTx.amount);
+        document.getElementById('kpiMaxTxMerchant').textContent = `${maxTx.merchant} (${maxTx.displayDate.slice(5, 10)})`;
+      } else {
+        document.getElementById('kpiMaxTx').textContent = 'HK$0.00';
+        document.getElementById('kpiMaxTxMerchant').textContent = '暫無交易';
+      }
+    }
+
+    function renderCardPieAndLegend(monthTx) {
+      document.getElementById('cardPiePeriodBadge').textContent = formatMonthLabel(state.selectedMonth);
+      const map = {};
+      monthTx.forEach(t => {
+        if (!map[t.card]) map[t.card] = { amount: 0, count: 0 };
+        map[t.card].amount += Math.max(0, t.amount);
+        map[t.card].count += 1;
+      });
+
+      const total = Object.values(map).reduce((s, v) => s + v.amount, 0);
+      const items = Object.entries(map)
+        .map(([label, data]) => ({
+          label,
+          amount: data.amount,
+          count: data.count,
+          pct: total > 0 ? (data.amount / total) * 100 : 0,
+          color: (state.cardColorMap[label] || CARD_PALETTE[0]).solid
+        }))
+        .sort((a, b) => b.amount - a.amount);
+
+      renderPieChart('cardPieCanvas', items, total, state.chartTypes.card, state.hoveredSlice.cardPie, 'cardPie');
+
+      const legendEl = document.getElementById('cardLegendList');
+      if (items.length === 0) {
+        legendEl.innerHTML = `<div style="color:var(--text-muted); font-size:0.84rem; text-align:center; padding:20px;">本月無信用卡消費紀錄</div>`;
+        return;
+      }
+
+      legendEl.innerHTML = items.map((item, idx) => `
+        <div class="legend-item ${state.selectedCard === item.label ? 'active' : ''}" data-card-legend="${escapeHtml(item.label)}" data-idx="${idx}">
+          <div class="legend-left">
+            <span class="legend-dot" style="background:${item.color};"></span>
+            <div style="min-width:0;">
+              <div class="legend-name" title="${escapeHtml(item.label)}">${escapeHtml(item.label)}</div>
+              <div class="legend-pct">${item.count} 筆交易</div>
+            </div>
+          </div>
+          <div class="legend-right tabular-nums">
+            <div class="legend-amount">${formatHKD(item.amount)}</div>
+            <div class="legend-pct">${item.pct.toFixed(1)}%</div>
+          </div>
+        </div>
+      `).join('');
+
+      // 綁定圖例點擊篩選
+      legendEl.querySelectorAll('.legend-item').forEach(el => {
+        el.addEventListener('click', () => {
+          const cardName = el.getAttribute('data-card-legend');
+          state.selectedCard = state.selectedCard === cardName ? 'ALL' : cardName;
+          refreshDashboard();
+        });
+      });
+    }
+
+    function renderCategoryPieAndLegend(filteredTx) {
+      document.getElementById('catPiePeriodBadge').textContent =
+        state.selectedCard === 'ALL' ? formatMonthLabel(state.selectedMonth) : state.selectedCard;
+
+      const map = {};
+      filteredTx.forEach(t => {
+        if (!map[t.category]) map[t.category] = { amount: 0, count: 0 };
+        map[t.category].amount += Math.max(0, t.amount);
+        map[t.category].count += 1;
+      });
+
+      const total = Object.values(map).reduce((s, v) => s + v.amount, 0);
+      const items = Object.entries(map)
+        .map(([label, data]) => ({
+          label,
+          amount: data.amount,
+          count: data.count,
+          pct: total > 0 ? (data.amount / total) * 100 : 0,
+          color: (CATEGORY_CONFIG[label] || CATEGORY_CONFIG['日常消費']).color,
+          icon: (CATEGORY_CONFIG[label] || CATEGORY_CONFIG['日常消費']).icon
+        }))
+        .sort((a, b) => b.amount - a.amount);
+
+      renderPieChart('catPieCanvas', items, total, state.chartTypes.cat, state.hoveredSlice.catPie, 'catPie');
+
+      const legendEl = document.getElementById('catLegendList');
+      if (items.length === 0) {
+        legendEl.innerHTML = `<div style="color:var(--text-muted); font-size:0.84rem; text-align:center; padding:20px;">無符合篩選條件的分類數據</div>`;
+        return;
+      }
+
+      legendEl.innerHTML = items.map(item => `
+        <div class="legend-item ${state.selectedCategory === item.label ? 'active' : ''}" data-cat-legend="${escapeHtml(item.label)}">
+          <div class="legend-left">
+            <span class="legend-dot" style="background:${item.color};"></span>
+            <div>
+              <div class="legend-name">${item.icon} ${escapeHtml(item.label)}</div>
+              <div class="legend-pct">${item.count} 筆交易</div>
+            </div>
+          </div>
+          <div class="legend-right tabular-nums">
+            <div class="legend-amount">${formatHKD(item.amount)}</div>
+            <div class="legend-pct">${item.pct.toFixed(1)}%</div>
+          </div>
+        </div>
+      `).join('');
+
+      legendEl.querySelectorAll('.legend-item').forEach(el => {
+        el.addEventListener('click', () => {
+          const catName = el.getAttribute('data-cat-legend');
+          state.selectedCategory = state.selectedCategory === catName ? 'ALL' : catName;
+          document.getElementById('catFilterSelect').value = state.selectedCategory;
+          refreshDashboard();
+        });
+      });
+    }
+
+    function renderCardWallet(monthTx) {
+      const walletEl = document.getElementById('walletGrid');
+      const allCards = [...new Set(state.transactions.map(t => t.card))];
+      const totalMonth = monthTx.reduce((s, t) => s + Math.max(0, t.amount), 0);
+
+      if (allCards.length === 0) {
+        walletEl.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem; padding: 12px 0;">尚未匯入任何信用卡資料，匯入後將自動建立專屬卡片視圖。</div>`;
+        return;
+      }
+
+      const cardStats = allCards.map(cardName => {
+        const txs = monthTx.filter(t => t.card === cardName);
+        const sum = txs.reduce((s, t) => s + t.amount, 0);
+        const pct = totalMonth > 0 ? (Math.max(0, sum) / totalMonth) * 100 : 0;
+        return { cardName, sum, count: txs.length, pct };
+      }).sort((a, b) => b.sum - a.sum);
+
+      walletEl.innerHTML = cardStats.map(c => {
+        const theme = state.cardColorMap[c.cardName] || CARD_PALETTE[0];
+        const isSelected = state.selectedCard === c.cardName;
+        return `
+          <div class="credit-card-ui ${isSelected ? 'selected-card' : ''}" style="background:${theme.grad};" data-wallet-card="${escapeHtml(c.cardName)}">
+            <div class="cc-top">
+              <div class="cc-name">${escapeHtml(c.cardName)}</div>
+              <div class="cc-chip"></div>
+            </div>
+            <div class="cc-amount tabular-nums">${formatHKD(c.sum)}</div>
+            <div>
+              <div class="cc-meta tabular-nums">
+                <span>${c.count} 筆交易</span>
+                <span>佔比 ${c.pct.toFixed(1)}%</span>
+              </div>
+              <div class="cc-bar">
+                <div class="cc-bar-fill" style="width:${Math.min(100, c.pct)}%;"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      walletEl.querySelectorAll('.credit-card-ui').forEach(el => {
+        el.addEventListener('click', () => {
+          const name = el.getAttribute('data-wallet-card');
+          state.selectedCard = state.selectedCard === name ? 'ALL' : name;
+          refreshDashboard();
+        });
+      });
+    }
+
+    function renderBudgetAndMerchants(monthTx) {
+      // 1. 預算進度計算
+      const spent = monthTx.reduce((s, t) => s + Math.max(0, t.amount), 0);
+      const budget = Math.max(0, state.budget);
+      const pct = budget > 0 ? (spent / budget) * 100 : 0;
+      const fillEl = document.getElementById('budgetProgressFill');
+      fillEl.style.width = `${Math.min(100, pct)}%`;
+
+      if (pct >= 100) {
+        fillEl.style.backgroundColor = 'var(--danger)';
+        document.getElementById('budgetStatusText').innerHTML = `<span style="color:var(--danger); font-weight:700;">⚠️ 已超支 (${pct.toFixed(1)}%)</span>`;
+      } else if (pct >= 80) {
+        fillEl.style.backgroundColor = 'var(--warning)';
+        document.getElementById('budgetStatusText').innerHTML = `<span style="color:var(--warning); font-weight:700;">接近上限 (${pct.toFixed(1)}%)</span>`;
+      } else {
+        fillEl.style.backgroundColor = 'var(--success)';
+        document.getElementById('budgetStatusText').textContent = `已使用 ${pct.toFixed(1)}%`;
+      }
+
+      const diff = budget - spent;
+      document.getElementById('budgetRemainingText').textContent =
+        diff >= 0 ? `剩餘 ${formatHKD(diff)}` : `超出 ${formatHKD(Math.abs(diff))}`;
+
+      // 2. Top 5 商戶排行
+      const mMap = {};
+      monthTx.forEach(t => {
+        const key = t.merchant.trim();
+        if (!mMap[key]) mMap[key] = { amount: 0, count: 0 };
+        mMap[key].amount += Math.max(0, t.amount);
+        mMap[key].count += 1;
+      });
+
+      const topMerchants = Object.entries(mMap)
+        .map(([name, info]) => ({ name, ...info }))
+        .sort((a, b) => b.amount - a.amount)
+        .slice(0, 5);
+
+      const maxM = topMerchants.length > 0 ? topMerchants[0].amount : 1;
+      const boardEl = document.getElementById('merchantLeaderboard');
+
+      if (topMerchants.length === 0) {
+        boardEl.innerHTML = `<div style="color:var(--text-muted); font-size:0.82rem;">暫無商戶消費數據</div>`;
+        return;
+      }
+
+      boardEl.innerHTML = topMerchants.map((m, i) => `
+        <div class="merchant-row">
+          <div class="merchant-info">
+            <div class="merchant-title">
+              <span class="rank-num top-${i + 1}">${i + 1}</span>
+              <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(m.name)}">${escapeHtml(m.name)}</span>
+            </div>
+            <div class="tabular-nums" style="flex-shrink:0; font-weight:700;">
+              ${formatHKD(m.amount)} <span style="font-weight:400; color:var(--text-muted); font-size:0.75rem;">(${m.count}次)</span>
+            </div>
+          </div>
+          <div class="merchant-bar-bg">
+            <div class="merchant-bar-fill" style="width:${(m.amount / maxM) * 100}%;"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderTransactionTable(filteredTx) {
+      const sorted = [...filteredTx].sort((a, b) => {
+        if (state.sortBy === 'date-desc') return b.timestamp - a.timestamp;
+        if (state.sortBy === 'date-asc') return a.timestamp - b.timestamp;
+        if (state.sortBy === 'amount-desc') return b.amount - a.amount;
+        if (state.sortBy === 'amount-asc') return a.amount - b.amount;
+        return 0;
+      });
+
+      document.getElementById('tableCountBadge').textContent = `${sorted.length} 筆`;
+      const tbody = document.getElementById('txTableBody');
+
+      if (sorted.length === 0) {
+        const emptyMsg = state.transactions.length === 0
+          ? '目前尚無任何交易紀錄，請點擊上方「貼上 / 匯入紀錄」或「記一筆」開始分析。'
+          : '找不到符合條件的交易紀錄，請嘗試調整篩選器或搜尋關鍵字。';
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--text-muted);">${emptyMsg}</td></tr>`;
+        return;
+      }
+
+      const categories = Object.keys(CATEGORY_CONFIG);
+
+      tbody.innerHTML = sorted.map(tx => {
+        const cardColor = (state.cardColorMap[tx.card] || CARD_PALETTE[0]).solid;
+        const catOptions = categories.map(c =>
+          `<option value="${c}" ${tx.category === c ? 'selected' : ''}>${CATEGORY_CONFIG[c].icon} ${c}</option>`
+        ).join('');
+
+        return `
+          <tr>
+            <td class="tabular-nums" style="white-space:nowrap;">
+              <div style="font-weight:600;">${tx.displayDate}</div>
+              <div style="font-size:0.74rem; color:var(--text-muted);">${tx.weekday}</div>
+            </td>
+            <td style="font-weight:600; max-width:280px;">${escapeHtml(tx.merchant)}</td>
+            <td>
+              <select class="cat-select" data-tx-cat="${tx.id}" aria-label="更改交易分類">
+                ${catOptions}
+              </select>
+            </td>
+            <td>
+              <span class="card-pill">
+                <span class="card-pill-dot" style="background:${cardColor};"></span>
+                ${escapeHtml(tx.card)}
+              </span>
+            </td>
+            <td class="amount-cell tabular-nums ${tx.amount < 0 ? 'amount-negative' : ''}">
+              ${formatHKD(tx.amount)}
+            </td>
+            <td style="text-align:center;">
+              <button class="btn-del" data-tx-del="${tx.id}" title="刪除此筆紀錄" aria-label="刪除紀錄">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // 綁定分類即時修改
+      tbody.querySelectorAll('.cat-select').forEach(sel => {
+        sel.addEventListener('change', (e) => {
+          const id = e.target.getAttribute('data-tx-cat');
+          const tx = state.transactions.find(t => t.id === id);
+          if (tx) {
+            tx.category = e.target.value;
+            saveTransactions();
+            refreshDashboard();
+            showToast(`已更新「${tx.merchant}」分類為 ${tx.category}`);
+          }
+        });
+      });
+
+      // 綁定刪除按鈕
+      tbody.querySelectorAll('.btn-del').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-tx-del');
+          state.transactions = state.transactions.filter(t => t.id !== id);
+          saveTransactions();
+          refreshDashboard();
+          showToast('已刪除該筆交易紀錄');
+        });
+      });
+    }
+
+    // ==========================================================================
+    // 7. Canvas 滑鼠與觸控互動 (Hover Tooltip & Click Selection)
+    // ==========================================================================
+
+    function setupCanvasInteractions() {
+      const tooltip = document.getElementById('chartTooltip');
+
+      function showTooltip(clientX, clientY, html) {
+        tooltip.innerHTML = html;
+        tooltip.classList.add('visible');
+        const rect = tooltip.getBoundingClientRect();
+        let left = clientX + 14;
+        let top = clientY - rect.height - 10;
+        if (left + rect.width > window.innerWidth - 10) left = clientX - rect.width - 14;
+        if (top < 10) top = clientY + 18;
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${top}px`;
+      }
+
+      function hideTooltip() {
+        tooltip.classList.remove('visible');
+      }
+
+      function handlePiePointer(canvas, hitKey, clientX, clientY, isClick = false) {
+        const rect = canvas.getBoundingClientRect();
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+        const areas = state.hitAreas[hitKey];
+        if (!areas || areas.length === 0) return;
+
+        const { cx, cy } = areas[0];
+        const dx = x - cx;
+        const dy = y - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        // 轉換角度為 0 ~ 2PI (從正上方順時針起算)
+        let angle = Math.atan2(dy, dx) + Math.PI / 2;
+        if (angle < 0) angle += Math.PI * 2;
+
+        const hit = areas.find(a =>
+          dist >= a.innerRadius && dist <= a.outerRadius + 6 &&
+          angle >= a.startAngle && angle <= a.endAngle
+        );
+
+        if (hit) {
+          if (state.hoveredSlice[hitKey] !== hit.index) {
+            state.hoveredSlice[hitKey] = hit.index;
+            refreshDashboard();
+          }
+          showTooltip(clientX, clientY, `
+            <div style="font-weight:700; margin-bottom:3px; color:#fff;">${escapeHtml(hit.item.label)}</div>
+            <div class="tabular-nums">金額：<strong>${formatHKD(hit.item.amount)}</strong> (${hit.item.pct.toFixed(1)}%)</div>
+            <div style="font-size:0.75rem; color:#94a3b8;">交易筆數：${hit.item.count} 筆</div>
+          `);
+
+          if (isClick) {
+            if (hitKey === 'cardPie') {
+              state.selectedCard = state.selectedCard === hit.item.label ? 'ALL' : hit.item.label;
+            } else if (hitKey === 'catPie') {
+              state.selectedCategory = state.selectedCategory === hit.item.label ? 'ALL' : hit.item.label;
+              document.getElementById('catFilterSelect').value = state.selectedCategory;
+            }
+            refreshDashboard();
+          }
+        } else {
+          if (state.hoveredSlice[hitKey] !== -1) {
+            state.hoveredSlice[hitKey] = -1;
+            refreshDashboard();
+          }
+          hideTooltip();
+        }
+      }
+
+      ['cardPieCanvas', 'catPieCanvas'].forEach(id => {
+        const canvas = document.getElementById(id);
+        const key = id === 'cardPieCanvas' ? 'cardPie' : 'catPie';
+        canvas.addEventListener('mousemove', e => handlePiePointer(canvas, key, e.clientX, e.clientY, false));
+        canvas.addEventListener('click', e => handlePiePointer(canvas, key, e.clientX, e.clientY, true));
+        canvas.addEventListener('mouseleave', () => {
+          state.hoveredSlice[key] = -1;
+          hideTooltip();
+          refreshDashboard();
+        });
+      });
+
+      // 長條圖互動
+      const barCanvas = document.getElementById('trendBarCanvas');
+      barCanvas.addEventListener('mousemove', e => {
+        const rect = barCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const hit = state.hitAreas.trendBar.find(b => x >= b.x && x <= b.x + b.w);
+        if (hit) {
+          if (state.hoveredSlice.trendBar !== hit.index) {
+            state.hoveredSlice.trendBar = hit.index;
+            renderTrendBarChart(getFilteredTransactions(false));
+          }
+          showTooltip(e.clientX, e.clientY, `
+            <div style="font-weight:700; margin-bottom:2px;">${hit.bar.key}</div>
+            <div class="tabular-nums">消費總額：<strong>${formatHKD(hit.bar.amount)}</strong></div>
+          `);
+        } else {
+          hideTooltip();
+        }
+      });
+      barCanvas.addEventListener('mouseleave', () => {
+        state.hoveredSlice.trendBar = -1;
+        hideTooltip();
+        renderTrendBarChart(getFilteredTransactions(false));
+      });
+    }
+
+    // ==========================================================================
+    // 8. 匯入、匯出與事件綁定 (Modals, Export & Event Listeners)
+    // ==========================================================================
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem(STORAGE_KEYS.THEME, theme);
+      document.getElementById('themeIconSun').style.display = theme === 'dark' ? 'block' : 'none';
+      document.getElementById('themeIconMoon').style.display = theme === 'dark' ? 'none' : 'block';
+    }
+
+    function showToast(msg) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = msg;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        toast.style.transition = 'all 0.2s ease';
+        setTimeout(() => toast.remove(), 220);
+      }, 2800);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function exportToCSV() {
+      const rows = getFilteredTransactions(false);
+      if (rows.length === 0) {
+        showToast('目前沒有可匯出的交易紀錄');
+        return;
+      }
+      const header = ['日期時間', '商戶', '分類', '信用卡', '金額(HKD)'];
+      const csvLines = [
+        header.join(','),
+        ...rows.map(r => [
+          `"${r.displayDate}"`,
+          `"${r.merchant.replace(/"/g, '""')}"`,
+          `"${r.category}"`,
+          `"${r.card.replace(/"/g, '""')}"`,
+          r.amount.toFixed(2)
+        ].join(','))
+      ];
+      // 加入 UTF-8 BOM 確保 Excel 開啟繁體中文絕不亂碼
+      const blob = new Blob(['\uFEFF' + csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `CardPulse_交易分析_${state.selectedMonth}_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast(`已成功匯出 ${rows.length} 筆交易 CSV 檔案`);
+    }
+
+    function copyFormattedSummary() {
+      const monthTx = state.transactions.filter(t => state.selectedMonth === 'ALL' || t.monthKey === state.selectedMonth);
+      const total = monthTx.reduce((s, t) => s + t.amount, 0);
+      const cardSums = {};
+      monthTx.forEach(t => { cardSums[t.card] = (cardSums[t.card] || 0) + t.amount; });
+
+      let report = `📊 CardPulse HK 消費分析摘要 (${formatMonthLabel(state.selectedMonth)})\n`;
+      report += `總支出：${formatHKD(total)}（共 ${monthTx.length} 筆交易）\n`;
+      report += `------------------------------\n`;
+      Object.entries(cardSums).sort((a, b) => b[1] - a[1]).forEach(([card, amt]) => {
+        const pct = total > 0 ? ((amt / total) * 100).toFixed(1) : '0.0';
+        report += `• ${card}: ${formatHKD(amt)} (${pct}%)\n`;
+      });
+
+      const tempInput = document.createElement('textarea');
+      tempInput.value = report;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+      showToast('已複製消費分析摘要至剪貼簿');
+    }
+
+    function exportToJSON() {
+      if (state.transactions.length === 0) {
+        showToast('目前沒有可備份的本地紀錄');
+        return;
+      }
+      const payload = {
+        app: 'CardPulse HK',
+        exportedAt: new Date().toISOString(),
+        budget: state.budget,
+        transactions: state.transactions
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `CardPulse_本地備份_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast(`已下載完整 JSON 備份（共 ${state.transactions.length} 筆）`);
+    }
+
+    function bindAllEvents() {
+      // 主題切換
+      document.getElementById('themeToggleBtn').addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        applyTheme(current === 'dark' ? 'light' : 'dark');
+        refreshDashboard();
+      });
+
+      // 篩選與排序控制
+      document.getElementById('monthSelect').addEventListener('change', e => {
+        state.selectedMonth = e.target.value;
+        refreshDashboard();
+      });
+      document.getElementById('cardFilterSelect').addEventListener('change', e => {
+        state.selectedCard = e.target.value;
+        refreshDashboard();
+      });
+      document.getElementById('catFilterSelect').addEventListener('change', e => {
+        state.selectedCategory = e.target.value;
+        refreshDashboard();
+      });
+      document.getElementById('sortSelect').addEventListener('change', e => {
+        state.sortBy = e.target.value;
+        renderTransactionTable(getFilteredTransactions(false));
+      });
+      document.getElementById('searchInput').addEventListener('input', e => {
+        state.searchQuery = e.target.value.trim();
+        refreshDashboard();
+      });
+      document.getElementById('clearCardFilterBtn').addEventListener('click', () => {
+        state.selectedCard = 'ALL';
+        refreshDashboard();
+      });
+
+      // 圓餅圖 / 環形圖切換
+      document.querySelectorAll('.chart-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const chart = btn.getAttribute('data-chart');
+          const type = btn.getAttribute('data-type');
+          state.chartTypes[chart] = type;
+          btn.parentElement.querySelectorAll('.chart-toggle-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          refreshDashboard();
+        });
+      });
+
+      // 預算即時儲存
+      document.getElementById('budgetInput').addEventListener('input', e => {
+        const val = parseFloat(e.target.value);
+        state.budget = Number.isFinite(val) && val >= 0 ? val : 0;
+        localStorage.setItem(STORAGE_KEYS.BUDGET, state.budget);
+        const monthTx = state.transactions.filter(t => state.selectedMonth === 'ALL' || t.monthKey === state.selectedMonth);
+        renderBudgetAndMerchants(monthTx);
+      });
+
+      // 匯入 Modal 邏輯
+      const importModal = document.getElementById('importModal');
+      const pasteArea = document.getElementById('pasteTextarea');
+      const previewBanner = document.getElementById('importPreviewBanner');
+      let parsedPreviewList = [];
+
+      const openImportModalFn = () => {
+        pasteArea.value = '';
+        parsedPreviewList = [];
+        previewBanner.innerHTML = `<span>等待貼上資料...</span><span class="tabular-nums">0 筆有效紀錄</span>`;
+        importModal.classList.add('open');
+        setTimeout(() => pasteArea.focus(), 60);
+      };
+
+      document.getElementById('openImportBtn').addEventListener('click', openImportModalFn);
+      document.getElementById('emptyCtaImportBtn').addEventListener('click', openImportModalFn);
+
+      const closeImport = () => importModal.classList.remove('open');
+      document.getElementById('closeImportModal').addEventListener('click', closeImport);
+      document.getElementById('cancelImportBtn').addEventListener('click', closeImport);
+
+      pasteArea.addEventListener('input', () => {
+        parsedPreviewList = parseRawTransactions(pasteArea.value);
+        const sum = parsedPreviewList.reduce((s, t) => s + t.amount, 0);
+        if (parsedPreviewList.length > 0) {
+          previewBanner.innerHTML = `
+            <span>✅ 成功解析 <strong>${parsedPreviewList.length}</strong> 筆交易</span>
+            <span class="tabular-nums">總金額：${formatHKD(sum)}</span>
+          `;
+        } else {
+          previewBanner.innerHTML = `<span>尚未偵測到有效格式，請確認包含日期、商戶、金額與信用卡</span><span>0 筆</span>`;
+        }
+      });
+
+      document.getElementById('importMergeBtn').addEventListener('click', () => {
+        if (parsedPreviewList.length === 0) {
+          showToast('請先貼上有效的交易紀錄');
+          return;
+        }
+        const existingSigs = new Set(state.transactions.map(t => t.signature));
+        let added = 0;
+        parsedPreviewList.forEach(item => {
+          if (!existingSigs.has(item.signature)) {
+            state.transactions.push(item);
+            existingSigs.add(item.signature);
+            added++;
+          }
+        });
+        saveTransactions();
+        refreshDashboard();
+        closeImport();
+        showToast(`成功附加 ${added} 筆新交易（已自動略過 ${parsedPreviewList.length - added} 筆重複紀錄）`);
+      });
+
+      document.getElementById('importReplaceBtn').addEventListener('click', () => {
+        if (parsedPreviewList.length === 0) {
+          showToast('請先貼上有效的交易紀錄');
+          return;
+        }
+        state.transactions = parsedPreviewList;
+        state.selectedMonth = 'ALL';
+        state.selectedCard = 'ALL';
+        saveTransactions();
+        refreshDashboard();
+        closeImport();
+        showToast(`已成功載入 ${parsedPreviewList.length} 筆交易紀錄`);
+      });
+
+      // 手動新增單筆 Modal
+      const addModal = document.getElementById('addTxModal');
+      const openAddModalFn = () => {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById('addDateInput').value = now.toISOString().slice(0, 16);
+        document.getElementById('addAmountInput').value = '';
+        document.getElementById('addMerchantInput').value = '';
+        addModal.classList.add('open');
+      };
+
+      document.getElementById('openAddBtn').addEventListener('click', openAddModalFn);
+      document.getElementById('emptyCtaAddBtn').addEventListener('click', openAddModalFn);
+
+      const closeAdd = () => addModal.classList.remove('open');
+      document.getElementById('closeAddModal').addEventListener('click', closeAdd);
+      document.getElementById('cancelAddBtn').addEventListener('click', closeAdd);
+
+      document.getElementById('addTxForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const rawDt = document.getElementById('addDateInput').value.replace('T', ' ');
+        const dInfo = parseDateInfo(rawDt);
+        const amount = parseAmount(document.getElementById('addAmountInput').value);
+        const merchant = document.getElementById('addMerchantInput').value.trim();
+        const card = document.getElementById('addCardInput').value.trim();
+        const catChoice = document.getElementById('addCatInput').value;
+
+        if (!dInfo || amount === null || !merchant || !card) {
+          showToast('請完整填寫所有欄位');
+          return;
+        }
+
+        const newTx = buildTxObject(dInfo, merchant, amount, card, catChoice === 'AUTO' ? null : catChoice);
+        state.transactions.unshift(newTx);
+        saveTransactions();
+        refreshDashboard();
+        closeAdd();
+        showToast(`已新增交易：${merchant} (${formatHKD(amount)})`);
+      });
+
+      // 匯出與重設
+      document.getElementById('exportCsvBtn').addEventListener('click', exportToCSV);
+      document.getElementById('exportJsonBtn').addEventListener('click', exportToJSON);
+      document.getElementById('copyReportBtn').addEventListener('click', copyFormattedSummary);
+
+      // JSON 備份檔還原
+      document.getElementById('restoreJsonInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          try {
+            const data = JSON.parse(evt.target.result);
+            const list = Array.isArray(data) ? data : (Array.isArray(data.transactions) ? data.transactions : null);
+            if (!list) throw new Error('無效的備份檔案格式');
+            state.transactions = list;
+            if (typeof data.budget === 'number' && data.budget >= 0) {
+              state.budget = data.budget;
+              document.getElementById('budgetInput').value = data.budget;
+              localStorage.setItem(STORAGE_KEYS.BUDGET, data.budget);
+            }
+            saveTransactions();
+            refreshDashboard();
+            showToast(`成功還原 ${list.length} 筆交易紀錄`);
+          } catch (err) {
+            showToast('JSON 備份檔格式錯誤，無法還原');
+          }
+          e.target.value = '';
+        };
+        reader.readAsText(file);
+      });
+
+      // 雙重確認清空所有本地紀錄（不使用 window.confirm）
+      const clearBtn = document.getElementById('clearAllDataBtn');
+      clearBtn.addEventListener('click', () => {
+        if (!state.clearConfirmPending) {
+          state.clearConfirmPending = true;
+          clearBtn.textContent = '確定清空？再按一次確認';
+          clearBtn.style.background = 'var(--danger)';
+          clearBtn.style.color = '#ffffff';
+          clearTimeout(state.clearConfirmTimer);
+          state.clearConfirmTimer = setTimeout(() => {
+            state.clearConfirmPending = false;
+            clearBtn.textContent = '清空所有本地紀錄';
+            clearBtn.style.background = '';
+            clearBtn.style.color = '';
+          }, 3500);
+          return;
+        }
+
+        clearTimeout(state.clearConfirmTimer);
+        state.clearConfirmPending = false;
+        clearBtn.textContent = '清空所有本地紀錄';
+        clearBtn.style.background = '';
+        clearBtn.style.color = '';
+
+        state.transactions = [];
+        state.cardColorMap = {};
+        state.selectedMonth = 'ALL';
+        state.selectedCard = 'ALL';
+        state.selectedCategory = 'ALL';
+        localStorage.removeItem(STORAGE_KEYS.TX_LIST);
+        refreshDashboard();
+        showToast('已永久清除瀏覽器內所有交易紀錄');
+      });
+
+      // 視窗大小變更時自動重繪高清 Canvas
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => refreshDashboard(), 120);
+      });
+    }
+
+    // 啟動應用程式
+    window.addEventListener('DOMContentLoaded', () => {
+      loadInitialState();
+      bindAllEvents();
+      setupCanvasInteractions();
+      refreshDashboard();
+    });
+  </script>
+</body>
+</html>
